@@ -17,6 +17,14 @@ var descriptionsList = [
   'Вот это тачка!'
 ];
 
+var picturesTemplate = document.querySelector('#picture')
+  .content
+  .querySelector('.picture');
+var photosFragment = document.createDocumentFragment();
+var picturesList = document.querySelector('.pictures');
+var commentsFragment = document.createDocumentFragment();
+var bigPicturePhoto;
+
 var getRandomNumber = function (min, max) {
   return Math.round(Math.random() * (max - min) + min);
 };
@@ -33,19 +41,14 @@ var CreatePhoto = function (index, likes, comments, description) {
   this.comments = comments;
   this.description = description[getRandomNumber(null, 5)];
 };
-
 var getPhotos = function () {
   var photos = [];
   for (var i = 1; i < 26; i++) {
     photos.push(new CreatePhoto(i, getRandomNumber(15, 200), getComments(commentsList), descriptionsList));
   }
+  bigPicturePhoto = photos[0];
   return photos;
 };
-
-
-var picturesTemplate = document.querySelector('#picture')
-  .content
-  .querySelector('.picture');
 
 var renderPhoto = function (photo) {
   var photoElement = picturesTemplate.cloneNode(true);
@@ -54,40 +57,32 @@ var renderPhoto = function (photo) {
   photoElement.querySelector('.picture__comments').textContent = photo.comments.length;
   return photoElement;
 };
-
-var fragment = document.createDocumentFragment();
-
 getPhotos().forEach(function (item) {
-  fragment.appendChild(renderPhoto(item));
+  photosFragment.appendChild(renderPhoto(item));
 });
+picturesList.appendChild(photosFragment);
 
-var picturesList = document.querySelector('.pictures');
-picturesList.appendChild(fragment);
-
-
-var bigPicture = document.querySelector('.big-picture');
-bigPicture.classList.remove('hidden');
-var bigPicturePhoto = getPhotos()[0];
-
-var commentsFragment = document.createDocumentFragment();
-var commentsTemplate = bigPicture.querySelector('.social__comment');
-
-var createComments = function (bigPicPhoto) {
+var createComments = function (bigPicPhoto, comment) {
   bigPicPhoto.comments.forEach(function (item) {
-    var commentElement = commentsTemplate.cloneNode(true);
+    var commentElement = comment.cloneNode(true);
     commentElement.querySelector('.social__picture').src = 'img/avatar-' + getRandomNumber(1, 6) + '.svg';
     commentElement.querySelector('.social__text').textContent = item;
     commentsFragment.appendChild(commentElement);
   });
   return commentsFragment;
 };
-
-bigPicture.querySelector('.big-picture__img img').src = bigPicturePhoto.url;
-bigPicture.querySelector('.likes-count').textContent = bigPicturePhoto.likes;
-bigPicture.querySelector('.comments-count').textContent = bigPicturePhoto.comments.length;
-bigPicture.querySelector('.social__comments').innerHTML = '';
-bigPicture.querySelector('.social__comments').appendChild(createComments(bigPicturePhoto));
-bigPicture.querySelector('.social__caption').textContent = bigPicturePhoto.description;
+var renderBigPhoto = function () {
+  var bigPicture = document.querySelector('.big-picture');
+  bigPicture.classList.remove('hidden');
+  var commentsTemplate = bigPicture.querySelector('.social__comment');
+  bigPicture.querySelector('.big-picture__img img').src = bigPicturePhoto.url;
+  bigPicture.querySelector('.likes-count').textContent = bigPicturePhoto.likes;
+  bigPicture.querySelector('.comments-count').textContent = bigPicturePhoto.comments.length;
+  bigPicture.querySelector('.social__comments').innerHTML = '';
+  bigPicture.querySelector('.social__comments').appendChild(createComments(bigPicturePhoto, commentsTemplate));
+  bigPicture.querySelector('.social__caption').textContent = bigPicturePhoto.description;
+};
+renderBigPhoto();
 
 document.querySelector('.social__comment-count').classList.add('visually-hidden');
 document.querySelector('.comments-loader').classList.add('visually-hidden');
