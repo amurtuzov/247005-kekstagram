@@ -23,7 +23,8 @@ var picturesTemplate = document.querySelector('#picture')
 var photosFragment = document.createDocumentFragment();
 var picturesList = document.querySelector('.pictures');
 var commentsFragment = document.createDocumentFragment();
-var bigPicturePhoto;
+var uploadInput = document.querySelector('#upload-file');
+var uploadFileForm = document.querySelector('.img-upload__overlay');
 
 var getRandomNumber = function (min, max) {
   return Math.round(Math.random() * (max - min) + min);
@@ -46,7 +47,6 @@ var getPhotos = function () {
   for (var i = 1; i < 26; i++) {
     photos.push(new CreatePhoto(i, getRandomNumber(15, 200), getComments(commentsList), descriptionsList));
   }
-  bigPicturePhoto = photos[0];
   return photos;
 };
 
@@ -55,6 +55,10 @@ var renderPhoto = function (photo) {
   photoElement.querySelector('.picture__img').src = photo.url;
   photoElement.querySelector('.picture__likes').textContent = photo.likes;
   photoElement.querySelector('.picture__comments').textContent = photo.comments.length;
+  photoElement.addEventListener('click', function (evt) {
+    evt.preventDefault();
+    renderBigPhoto(photo);
+  })
   return photoElement;
 };
 getPhotos().forEach(function (item) {
@@ -71,7 +75,7 @@ var createComments = function (bigPicPhoto, comment) {
   });
   return commentsFragment;
 };
-var renderBigPhoto = function () {
+var renderBigPhoto = function (bigPicturePhoto) {
   var bigPicture = document.querySelector('.big-picture');
   bigPicture.classList.remove('hidden');
   var commentsTemplate = bigPicture.querySelector('.social__comment');
@@ -81,8 +85,66 @@ var renderBigPhoto = function () {
   bigPicture.querySelector('.social__comments').innerHTML = '';
   bigPicture.querySelector('.social__comments').appendChild(createComments(bigPicturePhoto, commentsTemplate));
   bigPicture.querySelector('.social__caption').textContent = bigPicturePhoto.description;
+  bigPicture.querySelector('.big-picture__cancel').addEventListener('click', function (evt) {
+    bigPicture.classList.add('hidden');
+  });
+  document.addEventListener('keydown', function (evt) {
+    if(evt.keyCode === 27) {
+      bigPicture.classList.add('hidden');
+    }
+  });
 };
-renderBigPhoto();
 
 document.querySelector('.social__comment-count').classList.add('visually-hidden');
 document.querySelector('.comments-loader').classList.add('visually-hidden');
+
+uploadInput.addEventListener('change', function (evt) {
+  uploadFileForm.classList.remove('hidden');
+  uploadFileForm.querySelector('.img-upload__cancel').addEventListener('click', function (evt) {
+    uploadFileForm.classList.add('hidden');
+    uploadInput.value = '';
+  });
+  document.addEventListener('keydown', function (evt) {
+    if(evt.keyCode === 27) {
+      uploadFileForm.classList.add('hidden');
+      uploadInput.value = '';
+    }
+  });
+});
+
+var effectsList = document.querySelectorAll('.effects__item');
+var uploadedImg = document.querySelector('.img-upload__preview img');
+
+[].forEach.call(effectsList, function (item) {
+  item.addEventListener('click', function (evt) {
+    uploadedImg.classList = '';
+    var effect = item.querySelector('input').value;
+    uploadedImg.style = '';
+    uploadedImg.classList.add('effects__preview--' + effect);
+  })
+});
+
+var getEffectLevel = function(currentPos, maxPos) {
+  return Math.round(currentPos * 100 / maxPos);
+}
+
+var effectLine = document.querySelector('.effect-level__line');
+var effectPin = document.querySelector('.effect-level__pin');
+var effectLevelInput = document.querySelector('.effect-level__value');
+effectLine.querySelector('.effect-level__pin').addEventListener('mouseup', function(evt) {
+    var effectLevel = getEffectLevel(effectPin.offsetLeft, effectLine.offsetWidth);
+    effectLevelInput.value = effectLevel;
+    if(uploadedImg.matches('.effects__preview--chrome')) {
+      uploadedImg.style.filter = 'grayscale(' + 1 / 100 * effectLevel + ')'
+    } else if(uploadedImg.matches('.effects__preview--sepia')) {
+      uploadedImg.style.filter = 'sepia(' + 1 / 100 * effectLevel + ')'
+    } else if(uploadedImg.matches('.effects__preview--marvin')) {
+      uploadedImg.style.filter = 'invert(' + effectLevel + '%)';
+    } else if(uploadedImg.matches('.effects__preview--phobos')) {
+      uploadedImg.style.filter = 'blur(' + 3 / 100 * effectLevel + 'px)';
+    } else if(uploadedImg.matches('.effects__preview--heat')) {
+      uploadedImg.style.filter = 'brightness(' + 3 / 100 * effectLevel + ')';
+    } else {
+      uploadedImg.style.filter = '';
+    }
+});
