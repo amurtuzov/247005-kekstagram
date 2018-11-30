@@ -63,7 +63,7 @@ var renderPhoto = function (photo) {
   photoElement.addEventListener('click', function (evt) {
     evt.preventDefault();
     renderBigPhoto(photo);
-  })
+  });
   return photoElement;
 };
 [].forEach.call(getPhotos(), function (item) {
@@ -91,10 +91,11 @@ var renderBigPhoto = function (bigPicturePhoto) {
   bigPicture.querySelector('.social__comments').appendChild(createComments(bigPicturePhoto, commentsTemplate));
   bigPicture.querySelector('.social__caption').textContent = bigPicturePhoto.description;
   bigPicture.querySelector('.big-picture__cancel').addEventListener('click', function (evt) {
+    evt.preventDefault();
     bigPicture.classList.add('hidden');
   });
   document.addEventListener('keydown', function (evt) {
-    if(evt.keyCode === 27) {
+    if (evt.keyCode === 27) {
       bigPicture.classList.add('hidden');
     }
   });
@@ -112,6 +113,7 @@ var uploadFileFormEscPress = function (evt) {
 
 var uploadFileFormOpen = function () {
   uploadFileForm.classList.remove('hidden');
+  uploadFileForm.querySelector('.img-upload__cancel').addEventListener('click', uploadFileFormClose);
   document.addEventListener('keydown', uploadFileFormEscPress);
 };
 
@@ -121,41 +123,39 @@ var uploadFileFormClose = function () {
   document.removeEventListener('keydown', uploadFileFormEscPress);
 };
 
-uploadInput.addEventListener('change', function (evt) {
-  uploadFileForm.classList.remove('hidden');
-  uploadFileForm.querySelector('.img-upload__cancel').addEventListener('click', uploadFileFormClose);
-  document.addEventListener('keydown', uploadFileFormEscPress);
-});
+uploadInput.addEventListener('change', uploadFileFormOpen);
 
 [].forEach.call(effectsList, function (item) {
   item.addEventListener('click', function (evt) {
+    evt.preventDefault();
     uploadedImg.classList = '';
     var effect = item.querySelector('input').value;
     uploadedImg.style = '';
     uploadedImg.classList.add('effects__preview--' + effect);
-  })
+  });
 });
 
-var getEffectLevel = function(currentPos, maxPos) {
+var getEffectLevel = function (currentPos, maxPos) {
   return Math.round(currentPos * 100 / maxPos);
-}
-var setImgEffect = function() {
-  effectLine.querySelector('.effect-level__pin').addEventListener('mouseup', function(evt) {
+};
+var setImgEffect = function () {
+  effectLine.querySelector('.effect-level__pin').addEventListener('mouseup', function (evt) {
+    evt.preventDefault();
     var effectLevel = getEffectLevel(effectPin.offsetLeft, effectLine.offsetWidth);
     effectLevelInput.value = effectLevel;
-    if(uploadedImg.matches('.effects__preview--chrome')) {
-      uploadedImg.style.filter = 'grayscale(' + 1 / 100 * effectLevel + ')'
-    } else if(uploadedImg.matches('.effects__preview--sepia')) {
-      uploadedImg.style.filter = 'sepia(' + 1 / 100 * effectLevel + ')'
-    } else if(uploadedImg.matches('.effects__preview--marvin')) {
+    if (uploadedImg.matches('.effects__preview--chrome')) {
+      uploadedImg.style.filter = 'grayscale(' + 1 / 100 * effectLevel + ')';
+    } else if (uploadedImg.matches('.effects__preview--sepia')) {
+      uploadedImg.style.filter = 'sepia(' + 1 / 100 * effectLevel + ')';
+    } else if (uploadedImg.matches('.effects__preview--marvin')) {
       uploadedImg.style.filter = 'invert(' + effectLevel + '%)';
-    } else if(uploadedImg.matches('.effects__preview--phobos')) {
+    } else if (uploadedImg.matches('.effects__preview--phobos')) {
       uploadedImg.style.filter = 'blur(' + 3 / 100 * effectLevel + 'px)';
-    } else if(uploadedImg.matches('.effects__preview--heat')) {
+    } else if (uploadedImg.matches('.effects__preview--heat')) {
       uploadedImg.style.filter = 'brightness(' + 3 / 100 * effectLevel + ')';
     } else {
       uploadedImg.style.filter = '';
-    };
+    }
   });
 };
 setImgEffect();
@@ -167,39 +167,39 @@ var uploadFileFormValidate = function () {
     var target = evt.target;
     var checkSpace = target.value.match(/([a-z]{1,}#)/ig);
     var hashtagsArray = target.value.toLowerCase().split(' ');
-    if(checkSpace != null) {
+    if (checkSpace !== null) {
       target.setCustomValidity('Между хэш-тегами должен быть пробел');
-    } else if(hashtagsArray.length > 5) {
+    } else if (hashtagsArray.length > 5) {
       target.setCustomValidity('Нельзя указать больше пяти хэш-тегов');
     } else {
-    target.setCustomValidity('');
-    };
+      target.setCustomValidity('');
+    }
     [].forEach.call(hashtagsArray, function (item, index, arr) {
       function isSame(hashtag) {
-        return hashtag == item;
-      };
+        return hashtag === item;
+      }
       arr.splice(index, 1);
-      if(item == '#') {
-        target.setCustomValidity('Хэш-тег не может состоять только из одной решетки')
-      } else if(item.length > 20) {
-        target.setCustomValidity('Максимально допустимая длинна хэш-тега 20 символов')
-      } else if(item.indexOf('#', 0) != 0) {
-        target.setCustomValidity('Хэш-тег должен начинаться с символа #')
-      } else if(arr.some(isSame)) {
-        target.setCustomValidity('Один и тот же хэш-тег не может быть использован повторно')
+      if (item === '#') {
+        target.setCustomValidity('Хэш-тег не может состоять только из одной решетки');
+      } else if (item.length > 20) {
+        target.setCustomValidity('Максимально допустимая длинна хэш-тега 20 символов');
+      } else if (item.indexOf('#', 0) !== 0) {
+        target.setCustomValidity('Хэш-тег должен начинаться с символа #');
+      } else if (arr.some(isSame)) {
+        target.setCustomValidity('Один и тот же хэш-тег не может быть использован повторно');
       }
     });
   });
-  hashtagInput.addEventListener('focus', function (evt) {
+  hashtagInput.addEventListener('focus', function () {
     document.removeEventListener('keydown', uploadFileFormEscPress);
   });
-  hashtagInput.addEventListener('blur', function (evt) {
+  hashtagInput.addEventListener('blur', function () {
     document.addEventListener('keydown', uploadFileFormEscPress);
   });
-  commentInput.addEventListener('focus', function (evt) {
+  commentInput.addEventListener('focus', function () {
     document.removeEventListener('keydown', uploadFileFormEscPress);
   });
-  commentInput.addEventListener('blur', function (evt) {
+  commentInput.addEventListener('blur', function () {
     document.addEventListener('keydown', uploadFileFormEscPress);
   });
 };
