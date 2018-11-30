@@ -25,6 +25,11 @@ var picturesList = document.querySelector('.pictures');
 var commentsFragment = document.createDocumentFragment();
 var uploadInput = document.querySelector('#upload-file');
 var uploadFileForm = document.querySelector('.img-upload__overlay');
+var effectsList = document.querySelectorAll('.effects__item');
+var uploadedImg = document.querySelector('.img-upload__preview img');
+var effectLine = document.querySelector('.effect-level__line');
+var effectPin = document.querySelector('.effect-level__pin');
+var effectLevelInput = document.querySelector('.effect-level__value');
 
 var getRandomNumber = function (min, max) {
   return Math.round(Math.random() * (max - min) + min);
@@ -61,7 +66,7 @@ var renderPhoto = function (photo) {
   })
   return photoElement;
 };
-getPhotos().forEach(function (item) {
+[].forEach.call(getPhotos(), function (item) {
   photosFragment.appendChild(renderPhoto(item));
 });
 picturesList.appendChild(photosFragment);
@@ -98,22 +103,29 @@ var renderBigPhoto = function (bigPicturePhoto) {
 document.querySelector('.social__comment-count').classList.add('visually-hidden');
 document.querySelector('.comments-loader').classList.add('visually-hidden');
 
+var uploadFileFormEscPress = function (evt) {
+  if (evt.keyCode === 27) {
+    uploadInput.value = '';
+    uploadFileFormClose();
+  }
+};
+
+var uploadFileFormOpen = function () {
+  uploadFileForm.classList.remove('hidden');
+  document.addEventListener('keydown', uploadFileFormEscPress);
+};
+
+var uploadFileFormClose = function () {
+  uploadFileForm.classList.add('hidden');
+  uploadInput.value = '';
+  document.removeEventListener('keydown', uploadFileFormEscPress);
+};
+
 uploadInput.addEventListener('change', function (evt) {
   uploadFileForm.classList.remove('hidden');
-  uploadFileForm.querySelector('.img-upload__cancel').addEventListener('click', function (evt) {
-    uploadFileForm.classList.add('hidden');
-    uploadInput.value = '';
-  });
-  document.addEventListener('keydown', function (evt) {
-    if(evt.keyCode === 27) {
-      uploadFileForm.classList.add('hidden');
-      uploadInput.value = '';
-    }
-  });
+  uploadFileForm.querySelector('.img-upload__cancel').addEventListener('click', uploadFileFormClose);
+  document.addEventListener('keydown', uploadFileFormEscPress);
 });
-
-var effectsList = document.querySelectorAll('.effects__item');
-var uploadedImg = document.querySelector('.img-upload__preview img');
 
 [].forEach.call(effectsList, function (item) {
   item.addEventListener('click', function (evt) {
@@ -127,11 +139,8 @@ var uploadedImg = document.querySelector('.img-upload__preview img');
 var getEffectLevel = function(currentPos, maxPos) {
   return Math.round(currentPos * 100 / maxPos);
 }
-
-var effectLine = document.querySelector('.effect-level__line');
-var effectPin = document.querySelector('.effect-level__pin');
-var effectLevelInput = document.querySelector('.effect-level__value');
-effectLine.querySelector('.effect-level__pin').addEventListener('mouseup', function(evt) {
+var setImgEffect = function() {
+  effectLine.querySelector('.effect-level__pin').addEventListener('mouseup', function(evt) {
     var effectLevel = getEffectLevel(effectPin.offsetLeft, effectLine.offsetWidth);
     effectLevelInput.value = effectLevel;
     if(uploadedImg.matches('.effects__preview--chrome')) {
@@ -146,5 +155,52 @@ effectLine.querySelector('.effect-level__pin').addEventListener('mouseup', funct
       uploadedImg.style.filter = 'brightness(' + 3 / 100 * effectLevel + ')';
     } else {
       uploadedImg.style.filter = '';
-    }
-});
+    };
+  });
+};
+setImgEffect();
+
+var uploadFileFormValidate = function () {
+  var hashtagInput = document.querySelector('.text__hashtags');
+  var commentInput = document.querySelector('.text__description');
+  hashtagInput.addEventListener('input', function (evt) {
+    var target = evt.target;
+    var checkSpace = target.value.match(/([a-z]{1,}#)/ig);
+    var hashtagsArray = target.value.toLowerCase().split(' ');
+    if(checkSpace != null) {
+      target.setCustomValidity('Между хэш-тегами должен быть пробел');
+    } else if(hashtagsArray.length > 5) {
+      target.setCustomValidity('Нельзя указать больше пяти хэш-тегов');
+    } else {
+    target.setCustomValidity('');
+    };
+    [].forEach.call(hashtagsArray, function (item, index, arr) {
+      function isSame(hashtag) {
+        return hashtag == item;
+      };
+      arr.splice(index, 1);
+      if(item == '#') {
+        target.setCustomValidity('Хэш-тег не может состоять только из одной решетки')
+      } else if(item.length > 20) {
+        target.setCustomValidity('Максимально допустимая длинна хэш-тега 20 символов')
+      } else if(item.indexOf('#', 0) != 0) {
+        target.setCustomValidity('Хэш-тег должен начинаться с символа #')
+      } else if(arr.some(isSame)) {
+        target.setCustomValidity('Один и тот же хэш-тег не может быть использован повторно')
+      }
+    });
+  });
+  hashtagInput.addEventListener('focus', function (evt) {
+    document.removeEventListener('keydown', uploadFileFormEscPress);
+  });
+  hashtagInput.addEventListener('blur', function (evt) {
+    document.addEventListener('keydown', uploadFileFormEscPress);
+  });
+  commentInput.addEventListener('focus', function (evt) {
+    document.removeEventListener('keydown', uploadFileFormEscPress);
+  });
+  commentInput.addEventListener('blur', function (evt) {
+    document.addEventListener('keydown', uploadFileFormEscPress);
+  });
+};
+uploadFileFormValidate();
