@@ -133,7 +133,7 @@ uploadInput.addEventListener('change', uploadFileFormOpen);
     uploadedImg.classList = '';
     var effect = item.querySelector('input').value;
     uploadedImg.style = '';
-    effectPin.style.left = '20%'
+    effectPin.style.left = '20%';
     effectDepth.style.width = '20%';
     uploadedImg.classList.add('effects__preview--' + effect);
     if (effect === 'none') {
