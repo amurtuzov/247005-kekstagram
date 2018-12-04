@@ -133,8 +133,9 @@ uploadInput.addEventListener('change', uploadFileFormOpen);
     uploadedImg.classList = '';
     var effect = item.querySelector('input').value;
     uploadedImg.style = '';
-    effectPin.style.left = '20%';
-    effectDepth.style.width = '20%';
+    effectPin.style.left = '100%';
+    effectDepth.style.width = '100%';
+    effectLevelInput.value = 100;
     uploadedImg.classList.add('effects__preview--' + effect);
     if (effect === 'none') {
       effectLevelSlider.style.display = 'none';
@@ -169,6 +170,7 @@ var setEffectLevel = function () {
 var setImgEffect = function () {
   effectPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
+
     var startCoords = {
       x: evt.clientX,
     };
@@ -186,8 +188,8 @@ var setImgEffect = function () {
       if (effectPin.offsetLeft - shift.x < 0) {
         effectPin.style.left = 0 + 'px';
         document.removeEventListener('mousemove', onMouseMove);
-      } else if (effectPin.offsetLeft > 453) {
-        effectPin.style.left = 453 + 'px';
+      } else if (effectPin.offsetLeft > effectLine.offsetWidth) {
+        effectPin.style.left = effectLine.offsetWidth + 'px';
         document.removeEventListener('mousemove', onMouseMove);
       }
       setEffectLevel();
