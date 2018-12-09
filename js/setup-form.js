@@ -2,7 +2,8 @@
 
 (function () {
   var uploadInput = document.querySelector('#upload-file');
-  var uploadFileForm = document.querySelector('.img-upload__overlay');
+  var uploadFileForm = document.querySelector('.img-upload__form');
+  var uploadFileOverlay = document.querySelector('.img-upload__overlay');
   var effectsList = document.querySelectorAll('.effects__item');
   var uploadedImg = document.querySelector('.img-upload__preview img');
   var effectLine = document.querySelector('.effect-level__line');
@@ -11,33 +12,48 @@
   var effectLevelSlider = document.querySelector('.effect-level');
   var effectDepth = effectLine.querySelector('.effect-level__depth');
 
+  var setFormToDefault = function () {
+    uploadInput.value = '';
+    uploadedImg.style = '';
+    uploadedImg.classList = 'effects__preview--heat';
+    effectPin.style.left = '100%';
+    effectDepth.style.width = '100%';
+    effectLevelInput.value = 100;
+    uploadFileForm.querySelector('#effect-heat').checked = true;
+    uploadFileForm.querySelector('.text__hashtags').value = '';
+    uploadFileForm.querySelector('.text__description').value = '';
+  };
+
   window.uploadFileFormEscPress = function (evt) {
     if (evt.keyCode === 27) {
-      uploadInput.value = '';
-      uploadFileFormClose();
+      window.uploadFileFormClose();
     }
   };
 
   var uploadFileFormOpen = function () {
-    uploadFileForm.classList.remove('hidden');
-    effectLevelSlider.style.display = 'none';
-    uploadFileForm.querySelector('.img-upload__cancel').addEventListener('click', uploadFileFormClose);
+    uploadFileOverlay.classList.remove('hidden');
+    uploadedImg.classList = 'effects__preview--heat';
+    effectPin.style.left = '100%';
+    effectDepth.style.width = '100%';
+    effectLevelInput.value = 100;
+    uploadFileOverlay.querySelector('.img-upload__cancel').addEventListener('click', window.uploadFileFormClose);
     document.addEventListener('keydown', window.uploadFileFormEscPress);
   };
 
-  var uploadFileFormClose = function () {
-    uploadFileForm.classList.add('hidden');
-    uploadInput.value = '';
+  window.uploadFileFormClose = function () {
+    uploadFileOverlay.classList.add('hidden');
+    setFormToDefault();
     document.removeEventListener('keydown', window.uploadFileFormEscPress);
   };
-
 
   uploadInput.addEventListener('change', uploadFileFormOpen);
   [].forEach.call(effectsList, function (item) {
     item.addEventListener('click', function (evt) {
       evt.preventDefault();
       uploadedImg.classList = '';
-      var effect = item.querySelector('input').value;
+      var input = item.querySelector('input');
+      var effect = input.value;
+      input.checked = true;
       uploadedImg.style = '';
       effectPin.style.left = '100%';
       effectDepth.style.width = '100%';
