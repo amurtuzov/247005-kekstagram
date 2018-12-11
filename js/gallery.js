@@ -63,7 +63,7 @@
       bigPicture.classList.add('hidden');
     });
     document.addEventListener('keydown', function (evt) {
-      if (evt.keyCode === 27) {
+      if (evt.keyCode === window.ESC_CODE) {
         bigPicture.classList.add('hidden');
       }
     });

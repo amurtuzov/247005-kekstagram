@@ -81,7 +81,7 @@
       successPopup.style.visibility = 'hidden';
     });
     document.addEventListener('keydown', function (closeEvt) {
-      if (closeEvt.keyCode === 27) {
+      if (closeEvt.keyCode === window.ESC_CODE) {
         successPopup.style.visibility = 'hidden';
       }
     });
@@ -98,7 +98,7 @@
       errorPopup.style.visibility = 'hidden';
     });
     document.addEventListener('keydown', function (closeEvt) {
-      if (closeEvt.keyCode === 27) {
+      if (closeEvt.keyCode === window.ESC_CODE) {
         errorPopup.style.visibility = 'hidden';
       }
     });

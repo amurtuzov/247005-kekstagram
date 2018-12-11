@@ -25,7 +25,7 @@
   };
 
   window.uploadFileFormEscPress = function (evt) {
-    if (evt.keyCode === 27) {
+    if (evt.keyCode === window.ESC_CODE) {
       window.uploadFileFormClose();
     }
   };
