@@ -2,9 +2,13 @@
 
 (function () {
   var uploadInput = document.querySelector('#upload-file');
+  var loadMessageTemplate = document.querySelector('#messages')
+    .content
+    .querySelector('.img-upload__message')
   var uploadFileForm = document.querySelector('.img-upload__form');
   var uploadFileOverlay = document.querySelector('.img-upload__overlay');
   var effectsList = document.querySelectorAll('.effects__item');
+  var imgWrapper = document.querySelector('.img-upload__preview')
   var uploadedImg = document.querySelector('.img-upload__preview img');
   var effectLine = document.querySelector('.effect-level__line');
   var effectPin = document.querySelector('.effect-level__pin');
@@ -31,10 +35,15 @@
   };
 
   var uploadFileFormOpen = function (evt) {
+    uploadedImg.style.visibility = 'hidden';
+    var loadingMessage = loadMessageTemplate.cloneNode(true);
+    imgWrapper.appendChild(loadingMessage);
     var target = evt.target;
     var blob = target.files[0];
     window.blobToBase64(blob, function (base64) {
       uploadedImg.src = 'data:image/png;base64,' + base64;
+      imgWrapper.removeChild(loadingMessage);
+      uploadedImg.style.visibility = 'visible';
     });
     uploadFileOverlay.classList.remove('hidden');
     uploadedImg.classList = 'effects__preview--heat';
