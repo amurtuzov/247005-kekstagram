@@ -30,7 +30,12 @@
     }
   };
 
-  var uploadFileFormOpen = function () {
+  var uploadFileFormOpen = function (evt) {
+    var target = evt.target;
+    var blob = target.files[0];
+    window.blobToBase64(blob, function (base64) {
+      uploadedImg.src = 'data:image/png;base64,' + base64;
+    });
     uploadFileOverlay.classList.remove('hidden');
     uploadedImg.classList = 'effects__preview--heat';
     effectPin.style.left = '100%';
