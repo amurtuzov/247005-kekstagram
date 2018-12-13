@@ -3,7 +3,7 @@
 
   var UPLOAD_URL = 'https://js.dump.academy/kekstagram';
   var LOAD_URL = 'https://js.dump.academy/kekstagram/data';
-  var TIMEOUT = 1000;
+  var TIMEOUT = 10000;
   var HTTP_STAUS_OK = 200;
   var XHR_RESPONSE_TYPE = 'json';
 
