@@ -41,5 +41,5 @@
     load: function (onSuccess, onError) {
       request('GET', LOAD_URL, null, onSuccess, onError);
     }
-  }
+  };
 })();
