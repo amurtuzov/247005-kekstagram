@@ -10,6 +10,8 @@
   var errorTemplate = document.querySelector('#error')
     .content
     .querySelector('.error');
+  var successPopup = successTemplate.cloneNode(true);
+  var errorPopup = errorTemplate.cloneNode(true);
 
   hashtagInput.addEventListener('input', function (evt) {
     var target = evt.target;
@@ -50,10 +52,10 @@
     });
   });
   hashtagInput.addEventListener('focus', function () {
-    document.removeEventListener('keydown', window.uploadFileFormEscPress);
+    document.removeEventListener('keydown', window.setupForm.uploadFileFormEscPress);
   });
   hashtagInput.addEventListener('blur', function () {
-    document.addEventListener('keydown', window.uploadFileFormEscPress);
+    document.addEventListener('keydown', window.setupForm.uploadFileFormEscPress);
   });
   commentInput.addEventListener('input', function (evt) {
     var target = evt.target;
@@ -66,22 +68,28 @@
     }
   });
   commentInput.addEventListener('focus', function () {
-    document.removeEventListener('keydown', window.uploadFileFormEscPress);
+    document.removeEventListener('keydown', window.setupForm.uploadFileFormEscPress);
   });
   commentInput.addEventListener('blur', function () {
-    document.addEventListener('keydown', window.uploadFileFormEscPress);
+    document.addEventListener('keydown', window.setupForm.uploadFileFormEscPress);
   });
 
-  var successHandler = function () {
-    window.uploadFileFormClose();
-    var successPopup = successTemplate.cloneNode(true);
+  var addPopups = function () {
     document.querySelector('main').appendChild(successPopup);
+    successPopup.style.visibility = 'hidden';
+    document.querySelector('main').appendChild(errorPopup);
+    errorPopup.style.visibility = 'hidden';
+  };
+  addPopups();
+
+  var successHandler = function () {
+    window.setupForm.uploadFileFormClose();
     successPopup.style.visibility = 'visible';
     successPopup.querySelector('.success__button').addEventListener('click', function () {
       successPopup.style.visibility = 'hidden';
     });
     document.addEventListener('keydown', function (closeEvt) {
-      if (closeEvt.keyCode === window.ESC_CODE) {
+      if (closeEvt.keyCode === window.utils.ESC_CODE) {
         successPopup.style.visibility = 'hidden';
       }
     });
@@ -90,15 +98,13 @@
     });
   };
   var errorHandler = function () {
-    window.uploadFileFormClose();
-    var errorPopup = errorTemplate.cloneNode(true);
-    document.querySelector('main').appendChild(errorPopup);
+    window.setupForm.uploadFileFormClose();
     errorPopup.style.visibility = 'visible';
     errorPopup.querySelector('.error__button').addEventListener('click', function () {
       errorPopup.style.visibility = 'hidden';
     });
     document.addEventListener('keydown', function (closeEvt) {
-      if (closeEvt.keyCode === window.ESC_CODE) {
+      if (closeEvt.keyCode === window.utils.ESC_CODE) {
         errorPopup.style.visibility = 'hidden';
       }
     });
@@ -107,7 +113,7 @@
     });
   };
   uploadFileForm.addEventListener('submit', function (evt) {
-    window.upload(new FormData(uploadFileForm), successHandler, errorHandler);
+    window.backend.upload(new FormData(uploadFileForm), successHandler, errorHandler);
     evt.preventDefault();
   });
 })();

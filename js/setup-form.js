@@ -17,6 +17,9 @@
   var effectDepth = effectLine.querySelector('.effect-level__depth');
   var scaleLevelInput = uploadFileForm.querySelector('.scale__control--value');
   var effectPreviews = uploadFileForm.querySelectorAll('.effects__preview');
+  var SCALE_STEP = 25;
+  var SCALE_MAX = 100;
+  window.setupForm = {};
 
   var setFormToDefault = function () {
     uploadInput.value = '';
@@ -29,11 +32,12 @@
     uploadFileForm.querySelector('.text__description').value = '';
   };
 
-  window.uploadFileFormEscPress = function (evt) {
-    if (evt.keyCode === window.ESC_CODE) {
-      window.uploadFileFormClose();
+  var uploadFileFormEscPress = function (evt) {
+    if (evt.keyCode === window.utils.ESC_CODE) {
+      uploadFileFormClose();
     }
   };
+  window.setupForm.uploadFileFormEscPress = uploadFileFormEscPress;
 
   var uploadFileFormOpen = function (evt) {
     uploadedImg.style.visibility = 'hidden';
@@ -41,29 +45,35 @@
     imgWrapper.appendChild(loadingMessage);
     var target = evt.target;
     var blob = target.files[0];
-    window.blobToBase64(blob, function (base64) {
-      uploadedImg.src = 'data:image/png;base64,' + base64;
+    if (blob.type === 'image/jpeg' || blob.type === 'image/png') {
+      window.utils.blobToBase64(blob, function (base64) {
+        uploadedImg.src = 'data:image/png;base64,' + base64;
+        imgWrapper.removeChild(loadingMessage);
+        uploadedImg.style.visibility = 'visible';
+        [].forEach.call(effectPreviews, function (item) {
+          item.style.backgroundImage = 'url(data:image/png;base64,' + base64 + ')';
+        });
+      });
+    } else {
       imgWrapper.removeChild(loadingMessage);
       uploadedImg.style.visibility = 'visible';
-      [].forEach.call(effectPreviews, function (item) {
-        item.style.backgroundImage = 'url(data:image/png;base64,' + base64 + ')';
-      });
-    });
+    }
     uploadFileOverlay.classList.remove('hidden');
     uploadedImg.classList = 'effects__preview--none';
     effectLevelSlider.style.display = 'none';
     uploadFileForm.querySelector('#effect-none').checked = true;
     scaleLevelInput.value = '100%';
     effectLevelInput.value = 0;
-    uploadFileOverlay.querySelector('.img-upload__cancel').addEventListener('click', window.uploadFileFormClose);
-    document.addEventListener('keydown', window.uploadFileFormEscPress);
+    uploadFileOverlay.querySelector('.img-upload__cancel').addEventListener('click', uploadFileFormClose);
+    document.addEventListener('keydown', uploadFileFormEscPress);
   };
 
-  window.uploadFileFormClose = function () {
+  var uploadFileFormClose = function () {
     uploadFileOverlay.classList.add('hidden');
     setFormToDefault();
-    document.removeEventListener('keydown', window.uploadFileFormEscPress);
+    document.removeEventListener('keydown', uploadFileFormEscPress);
   };
+  window.setupForm.uploadFileFormClose = uploadFileFormClose;
 
   uploadInput.addEventListener('change', uploadFileFormOpen);
   [].forEach.call(effectsList, function (item) {
@@ -93,18 +103,18 @@
     var scaleBigger = uploadFileForm.querySelector('.scale__control--bigger');
     scaleSmaller.addEventListener('click', function () {
       var scaleLevel = parseInt(scaleLevelInput.value.replace('%', ''), 10);
-      scaleLevel = scaleLevel - 25;
-      if (scaleLevel < 25) {
-        scaleLevel = 25;
+      scaleLevel = scaleLevel - SCALE_STEP;
+      if (scaleLevel < SCALE_STEP) {
+        scaleLevel = SCALE_STEP;
       }
       uploadedImg.style.transform = 'scale(' + scaleLevel / 100 + ')';
       scaleLevelInput.value = scaleLevel + '%';
     });
     scaleBigger.addEventListener('click', function () {
       var scaleLevel = parseInt(scaleLevelInput.value.replace('%', ''), 10);
-      scaleLevel = scaleLevel + 25;
-      if (scaleLevel > 100) {
-        scaleLevel = 100;
+      scaleLevel = scaleLevel + SCALE_STEP;
+      if (scaleLevel > SCALE_MAX) {
+        scaleLevel = SCALE_MAX;
       }
       uploadedImg.style.transform = 'scale(' + scaleLevel / 100 + ')';
       scaleLevelInput.value = scaleLevel + '%';
