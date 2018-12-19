@@ -33,13 +33,13 @@
     xhr.send(data);
 
   };
+  window.backend = {
+    upload: function (data, onSuccess, onError) {
+      request('POST', UPLOAD_URL, data, onSuccess, onError);
+    },
 
-
-  window.upload = function (data, onSuccess, onError) {
-    request('POST', UPLOAD_URL, data, onSuccess, onError);
-  };
-
-  window.load = function (onSuccess, onError) {
-    request('GET', LOAD_URL, null, onSuccess, onError);
+    load: function (onSuccess, onError) {
+      request('GET', LOAD_URL, null, onSuccess, onError);
+    }
   };
 })();
