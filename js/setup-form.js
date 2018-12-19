@@ -1,14 +1,14 @@
 'use strict';
 
 (function () {
+  var FILE_TYPES_REGEXP = /^(?:image\/bmp|image\/cis\-cod|image\/gif|image\/ief|image\/jpeg|image\/jpeg|image\/jpeg|image\/pipeg|image\/png|image\/svg\+xml|image\/tiff|image\/x\-cmu\-raster|image\/x\-cmx|image\/x\-icon|image\/x\-portable\-anymap|image\/x\-portable\-bitmap|image\/x\-portable\-graymap|image\/x\-portable\-pixmap|image\/x\-rgb|image\/x\-xbitmap|image\/x\-xpixmap|image\/x\-xwindowdump)$/i;
+  var SCALE_STEP = 25;
+  var SCALE_MAX = 100;
   var uploadInput = document.querySelector('#upload-file');
-  var loadMessageTemplate = document.querySelector('#messages')
-    .content
-    .querySelector('.img-upload__message');
   var uploadFileForm = document.querySelector('.img-upload__form');
   var uploadFileOverlay = document.querySelector('.img-upload__overlay');
+  var uploadFileFormCloser = uploadFileOverlay.querySelector('.img-upload__cancel');
   var effectsList = document.querySelectorAll('.effects__item');
-  var imgWrapper = document.querySelector('.img-upload__preview');
   var uploadedImg = document.querySelector('.img-upload__preview img');
   var effectLine = document.querySelector('.effect-level__line');
   var effectPin = document.querySelector('.effect-level__pin');
@@ -16,9 +16,6 @@
   var effectLevelSlider = document.querySelector('.effect-level');
   var effectDepth = effectLine.querySelector('.effect-level__depth');
   var scaleLevelInput = uploadFileForm.querySelector('.scale__control--value');
-  var effectPreviews = uploadFileForm.querySelectorAll('.effects__preview');
-  var SCALE_STEP = 25;
-  var SCALE_MAX = 100;
   window.setupForm = {};
 
   var setFormToDefault = function () {
@@ -27,6 +24,7 @@
     uploadedImg.classList = 'effects__preview--none';
     scaleLevelInput.value = '100%';
     effectLevelInput.value = 0;
+    effectLevelSlider.style.display = 'none';
     uploadFileForm.querySelector('#effect-none').checked = true;
     uploadFileForm.querySelector('.text__hashtags').value = '';
     uploadFileForm.querySelector('.text__description').value = '';
@@ -37,34 +35,29 @@
       uploadFileFormClose();
     }
   };
-  window.setupForm.uploadFileFormEscPress = uploadFileFormEscPress;
+
+  var checkLoadedFile = function (files) {
+    if (files.length === 0) {
+      return false;
+    }
+    if (!FILE_TYPES_REGEXP.test(files[0].type)) {
+      return false;
+    }
+    return true;
+  };
 
   var uploadFileFormOpen = function (evt) {
-    uploadedImg.style.visibility = 'hidden';
-    var loadingMessage = loadMessageTemplate.cloneNode(true);
-    imgWrapper.appendChild(loadingMessage);
     var target = evt.target;
-    var blob = target.files[0];
-    if (blob.type === 'image/jpeg' || blob.type === 'image/png') {
-      window.utils.blobToBase64(blob, function (base64) {
-        uploadedImg.src = 'data:image/png;base64,' + base64;
-        imgWrapper.removeChild(loadingMessage);
-        uploadedImg.style.visibility = 'visible';
-        [].forEach.call(effectPreviews, function (item) {
-          item.style.backgroundImage = 'url(data:image/png;base64,' + base64 + ')';
-        });
-      });
-    } else {
-      imgWrapper.removeChild(loadingMessage);
-      uploadedImg.style.visibility = 'visible';
+    var reader = new FileReader();
+    reader.onloadend = function () {
+      uploadedImg.src = reader.result;
+    };
+    if (checkLoadedFile(target.files)) {
+      reader.readAsDataURL(target.files[0]);
     }
     uploadFileOverlay.classList.remove('hidden');
-    uploadedImg.classList = 'effects__preview--none';
-    effectLevelSlider.style.display = 'none';
-    uploadFileForm.querySelector('#effect-none').checked = true;
-    scaleLevelInput.value = '100%';
-    effectLevelInput.value = 0;
-    uploadFileOverlay.querySelector('.img-upload__cancel').addEventListener('click', uploadFileFormClose);
+
+    uploadFileFormCloser.addEventListener('click', uploadFileFormClose);
     document.addEventListener('keydown', uploadFileFormEscPress);
   };
 
@@ -73,30 +66,30 @@
     setFormToDefault();
     document.removeEventListener('keydown', uploadFileFormEscPress);
   };
-  window.setupForm.uploadFileFormClose = uploadFileFormClose;
 
-  uploadInput.addEventListener('change', uploadFileFormOpen);
-  [].forEach.call(effectsList, function (item) {
-    item.addEventListener('click', function (evt) {
-      evt.preventDefault();
-      uploadedImg.classList = '';
-      scaleLevelInput.value = '100%';
-      var input = item.querySelector('input');
-      var effect = input.value;
-      input.checked = true;
-      uploadedImg.style = '';
-      effectPin.style.left = '100%';
-      effectDepth.style.width = '100%';
-      effectLevelInput.value = 100;
-      uploadedImg.classList.add('effects__preview--' + effect);
-      if (effect === 'none') {
-        effectLevelSlider.style.display = 'none';
-        effectLevelInput.value = 0;
-      } else {
-        effectLevelSlider.style.display = 'block';
-      }
+  var setupEffectsList = function () {
+    [].forEach.call(effectsList, function (item) {
+      item.addEventListener('click', function (evt) {
+        evt.preventDefault();
+        uploadedImg.classList = '';
+        scaleLevelInput.value = '100%';
+        var input = item.children[0];
+        var effect = input.value;
+        input.checked = true;
+        uploadedImg.style = '';
+        effectPin.style.left = '100%';
+        effectDepth.style.width = '100%';
+        effectLevelInput.value = 100;
+        uploadedImg.classList.add('effects__preview--' + effect);
+        if (effect === 'none') {
+          effectLevelSlider.style.display = 'none';
+          effectLevelInput.value = 0;
+        } else {
+          effectLevelSlider.style.display = 'block';
+        }
+      });
     });
-  });
+  };
 
   var scaleImg = function () {
     var scaleSmaller = uploadFileForm.querySelector('.scale__control--smaller');
@@ -120,7 +113,6 @@
       scaleLevelInput.value = scaleLevel + '%';
     });
   };
-  scaleImg();
 
   var getEffectLevel = function (currentPos, maxPos) {
     return Math.round(currentPos * 100 / maxPos);
@@ -183,5 +175,14 @@
       document.addEventListener('mouseup', onMouseUp);
     });
   };
-  setImgEffect();
+  var initSetupForm = function () {
+    window.setupForm.uploadFileFormEscPress = uploadFileFormEscPress;
+    window.setupForm.uploadFileFormClose = uploadFileFormClose;
+    uploadInput.addEventListener('change', uploadFileFormOpen);
+    setFormToDefault();
+    scaleImg();
+    setImgEffect();
+    setupEffectsList();
+  };
+  initSetupForm();
 })();
