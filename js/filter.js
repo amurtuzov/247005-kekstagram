@@ -1,6 +1,7 @@
 'use strict';
 
 (function () {
+  var NEW_PHOTOS_QUANTITY = 10;
   var imgFilter = document.querySelector('.img-filters');
   var byPopuparButton = imgFilter.querySelector('#filter-popular');
   var byNewButton = imgFilter.querySelector('#filter-new');
@@ -25,7 +26,7 @@
 
   var filterByNew = function () {
     var copy = window.gallery.photos.slice(0);
-    var newPhotos = window.utils.shuffle(copy).slice(0, 10);
+    var newPhotos = window.utils.shuffle(copy).slice(0, NEW_PHOTOS_QUANTITY);
     doFilter(byNewButton.id, newPhotos);
   };
 
