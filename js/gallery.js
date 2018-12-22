@@ -14,7 +14,7 @@
   var bigPictureDescription = bigPicture.querySelector('.social__caption');
   var bigPictureCloser = bigPicture.querySelector('.big-picture__cancel');
   var commentsCount = bigPicture.querySelector('.comments-count');
-  var commentsLoader = document.querySelector('.comments-loader');
+  var commentsLoader = bigPicture.querySelector('.comments-loader');
   var commentsTemplate = bigPicture.querySelector('.social__comment');
   var commentsFragment = document.createDocumentFragment();
   var photos = [];
@@ -104,9 +104,9 @@
     bigPicture.classList.remove('hidden');
     commentsLoader.classList.remove('visually-hidden');
 
-    var defaultCommentsNode = document.createTextNode('5 из ');
+    var defaultCommentsAmount = document.createTextNode('5 из ');
     commentsCount.parentNode.removeChild(commentsCount.previousSibling);
-    commentsCount.parentNode.insertBefore(defaultCommentsNode, commentsCount);
+    commentsCount.parentNode.insertBefore(defaultCommentsAmount, commentsCount);
 
     var commentsCounter = DEFAULT_COMMENTS_AMOUNT;
     var lazyLoadedComments = [];
@@ -116,9 +116,9 @@
     commentsCount.textContent = bigPicturePhoto.comments.length;
 
     if (bigPicturePhoto.comments.length < DEFAULT_COMMENTS_AMOUNT) {
-      var fewCommentsNode = document.createTextNode(bigPicturePhoto.comments.length + ' из ');
+      var fewCommentsAmount = document.createTextNode(bigPicturePhoto.comments.length + ' из ');
       commentsCount.parentNode.removeChild(commentsCount.previousSibling);
-      commentsCount.parentNode.insertBefore(fewCommentsNode, commentsCount);
+      commentsCount.parentNode.insertBefore(fewCommentsAmount, commentsCount);
       commentsLoader.classList.add('visually-hidden');
     }
 
@@ -137,9 +137,9 @@
           bigPictureComments.appendChild(loadComments(lazyLoadedComments[i], commentsTemplate));
         }
 
-        var dynamicCommentsNode = document.createTextNode(lazyLoadedComments.length + ' из ');
+        var dynamicCommentsAmount = document.createTextNode(lazyLoadedComments.length + ' из ');
         commentsCount.parentNode.removeChild(commentsCount.previousSibling);
-        commentsCount.parentNode.insertBefore(dynamicCommentsNode, commentsCount);
+        commentsCount.parentNode.insertBefore(dynamicCommentsAmount, commentsCount);
         if (lazyLoadedComments.length === bigPicturePhoto.comments.length) {
           commentsLoader.classList.add('visually-hidden');
         }

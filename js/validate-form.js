@@ -6,9 +6,9 @@
   var MAX_HASHTAG_LENGTH = 20;
   var MAX_COMMENT_LENGTH = 140;
   var uploadFileForm = document.querySelector('.img-upload__form');
-  var uploadFileOverlay = document.querySelector('.img-upload__overlay');
-  var hashtagInput = document.querySelector('.text__hashtags');
-  var commentInput = document.querySelector('.text__description');
+  var uploadFileOverlay = uploadFileForm.querySelector('.img-upload__overlay');
+  var hashtagInput = uploadFileForm.querySelector('.text__hashtags');
+  var commentInput = uploadFileForm.querySelector('.text__description');
   var successTemplate = document.querySelector('#success')
     .content
     .querySelector('.success');
@@ -61,10 +61,10 @@
       });
     });
     hashtagInput.addEventListener('focus', function () {
-      document.removeEventListener('keydown', window.setupForm.uploadFileFormEscPress);
+      document.removeEventListener('keydown', window.setupForm.uploadFileDialogEscPress);
     });
     hashtagInput.addEventListener('blur', function () {
-      document.addEventListener('keydown', window.setupForm.uploadFileFormEscPress);
+      document.addEventListener('keydown', window.setupForm.uploadFileDialogEscPress);
     });
   };
   var commentValidate = function () {
@@ -79,10 +79,10 @@
       }
     });
     commentInput.addEventListener('focus', function () {
-      document.removeEventListener('keydown', window.setupForm.uploadFileFormEscPress);
+      document.removeEventListener('keydown', window.setupForm.uploadFileDialogEscPress);
     });
     commentInput.addEventListener('blur', function () {
-      document.addEventListener('keydown', window.setupForm.uploadFileFormEscPress);
+      document.addEventListener('keydown', window.setupForm.uploadFileDialogEscPress);
     });
   };
 
@@ -94,7 +94,7 @@
   };
 
   var successHandler = function () {
-    window.setupForm.setFormToDefault();
+    window.setupForm.setToDefault();
     uploadFileOverlay.classList.add('hidden');
     successPopup.style.visibility = 'visible';
     successButton.addEventListener('click', function () {
@@ -110,7 +110,7 @@
     });
   };
   var errorHandler = function () {
-    window.setupForm.setFormToDefault();
+    window.setupForm.setToDefault();
     uploadFileOverlay.classList.add('hidden');
     errorPopup.style.visibility = 'visible';
     errorButton.addEventListener('click', function () {

@@ -6,14 +6,14 @@
   var SCALE_MAX = 100;
   var uploadInput = document.querySelector('#upload-file');
   var uploadFileForm = document.querySelector('.img-upload__form');
-  var uploadFileOverlay = document.querySelector('.img-upload__overlay');
-  var uploadFileFormCloser = uploadFileOverlay.querySelector('.img-upload__cancel');
-  var effectsList = document.querySelectorAll('.effects__item');
-  var uploadedImg = document.querySelector('.img-upload__preview img');
-  var effectLine = document.querySelector('.effect-level__line');
-  var effectPin = document.querySelector('.effect-level__pin');
-  var effectLevelInput = document.querySelector('.effect-level__value');
-  var effectLevelSlider = document.querySelector('.effect-level');
+  var uploadFileOverlay = uploadFileForm.querySelector('.img-upload__overlay');
+  var uploadFileFormCloser = uploadFileForm.querySelector('.img-upload__cancel');
+  var effectsList = uploadFileForm.querySelectorAll('.effects__item');
+  var uploadedImg = uploadFileForm.querySelector('.img-upload__preview img');
+  var effectLine = uploadFileForm.querySelector('.effect-level__line');
+  var effectPin = uploadFileForm.querySelector('.effect-level__pin');
+  var effectLevelInput = uploadFileForm.querySelector('.effect-level__value');
+  var effectLevelSlider = uploadFileForm.querySelector('.effect-level');
   var effectDepth = effectLine.querySelector('.effect-level__depth');
   var scaleLevelInput = uploadFileForm.querySelector('.scale__control--value');
   window.setupForm = {};
@@ -41,13 +41,7 @@
   };
 
   var checkLoadedFile = function (files) {
-    if (files.length === 0) {
-      return false;
-    }
-    if (!FILE_TYPES_REGEXP.test(files[0].type)) {
-      return false;
-    }
-    return true;
+    return files.length === 0 || FILE_TYPES_REGEXP.test(files[0].type);
   };
 
   var uploadFileFormOpen = function (evt) {
@@ -180,9 +174,8 @@
     });
   };
   var initSetupForm = function () {
-    window.setupForm.uploadFileFormEscPress = uploadFileFormEscPress;
-    window.setupForm.uploadFileFormClose = uploadFileFormClose;
-    window.setupForm.setFormToDefault = setFormToDefault;
+    window.setupForm.uploadFileDialogEscPress = uploadFileFormEscPress;
+    window.setupForm.setToDefault = setFormToDefault;
     uploadInput.addEventListener('change', uploadFileFormOpen);
     setFormToDefault();
     scaleImg();
