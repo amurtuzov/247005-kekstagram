@@ -5,6 +5,7 @@
   var MAX_HASHTAGS = 5;
   var MAX_HASHTAG_LENGTH = 20;
   var MAX_COMMENT_LENGTH = 140;
+  var main = document.querySelector('main');
   var uploadFileForm = document.querySelector('.img-upload__form');
   var uploadFileOverlay = uploadFileForm.querySelector('.img-upload__overlay');
   var hashtagInput = uploadFileForm.querySelector('.text__hashtags');
@@ -15,10 +16,6 @@
   var errorTemplate = document.querySelector('#error')
     .content
     .querySelector('.error');
-  var successPopup = successTemplate.cloneNode(true);
-  var successButton = successPopup.querySelector('.success__button');
-  var errorPopup = errorTemplate.cloneNode(true);
-  var errorButton = errorPopup.querySelector('.error__button');
 
   var hashtagsValidate = function () {
     hashtagInput.addEventListener('input', function (evt) {
@@ -86,45 +83,49 @@
     });
   };
 
-  var addPopups = function () {
-    document.querySelector('main').appendChild(successPopup);
-    successPopup.style.visibility = 'hidden';
-    document.querySelector('main').appendChild(errorPopup);
-    errorPopup.style.visibility = 'hidden';
+
+  var removePopup = function () {
+    main.removeChild(main.children[main.children.length - 1]);
+    document.removeEventListener('keydown', onKeydownClosePopup);
+    document.removeEventListener('click', onClickClosePopup);
+  };
+
+  var onClickClosePopup = function () {
+    removePopup();
+  };
+  var onKeydownClosePopup = function (closeEvt) {
+    if (closeEvt.keyCode === window.utils.ESC_CODE) {
+      removePopup();
+    }
   };
 
   var successHandler = function () {
+    var successPopup = successTemplate.cloneNode(true);
+    var successButton = successPopup.querySelector('.success__button');
+    main.appendChild(successPopup);
     window.setupForm.setToDefault();
     uploadFileOverlay.classList.add('hidden');
     successPopup.style.visibility = 'visible';
     successButton.addEventListener('click', function () {
       successPopup.style.visibility = 'hidden';
     });
-    document.addEventListener('keydown', function (closeEvt) {
-      if (closeEvt.keyCode === window.utils.ESC_CODE) {
-        successPopup.style.visibility = 'hidden';
-      }
-    });
-    document.addEventListener('click', function () {
-      successPopup.style.visibility = 'hidden';
-    });
+    document.addEventListener('keydown', onKeydownClosePopup);
+    document.addEventListener('click', onClickClosePopup);
   };
   var errorHandler = function () {
+    var errorPopup = errorTemplate.cloneNode(true);
+    var errorButton = errorPopup.querySelector('.error__button');
+    main.appendChild(errorPopup);
     window.setupForm.setToDefault();
     uploadFileOverlay.classList.add('hidden');
     errorPopup.style.visibility = 'visible';
     errorButton.addEventListener('click', function () {
       errorPopup.style.visibility = 'hidden';
     });
-    document.addEventListener('keydown', function (closeEvt) {
-      if (closeEvt.keyCode === window.utils.ESC_CODE) {
-        errorPopup.style.visibility = 'hidden';
-      }
-    });
-    document.addEventListener('click', function () {
-      errorPopup.style.visibility = 'hidden';
-    });
+    document.addEventListener('keydown', onKeydownClosePopup);
+    document.addEventListener('click', onClickClosePopup);
   };
+
   uploadFileForm.addEventListener('submit', function (evt) {
     window.backend.upload(new FormData(uploadFileForm), successHandler, errorHandler);
     evt.preventDefault();
@@ -132,7 +133,6 @@
   var initFormValidate = function () {
     hashtagsValidate();
     commentValidate();
-    addPopups();
   };
   initFormValidate();
 })();
