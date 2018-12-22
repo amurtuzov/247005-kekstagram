@@ -31,8 +31,12 @@
   };
 
   var uploadFileFormEscPress = function (evt) {
+    evt.preventDefault();
     if (evt.keyCode === window.utils.ESC_CODE) {
-      uploadFileFormClose();
+      uploadFileOverlay.classList.add('hidden');
+      setFormToDefault();
+      uploadFileFormCloser.removeEventListener('click', uploadFileFormClose);
+      document.removeEventListener('keydown', uploadFileFormEscPress);
     }
   };
 
@@ -56,14 +60,15 @@
       reader.readAsDataURL(target.files[0]);
     }
     uploadFileOverlay.classList.remove('hidden');
-
     uploadFileFormCloser.addEventListener('click', uploadFileFormClose);
     document.addEventListener('keydown', uploadFileFormEscPress);
   };
 
-  var uploadFileFormClose = function () {
+  var uploadFileFormClose = function (evt) {
+    evt.preventDefault();
     uploadFileOverlay.classList.add('hidden');
     setFormToDefault();
+    uploadFileFormCloser.removeEventListener('click', uploadFileFormClose);
     document.removeEventListener('keydown', uploadFileFormEscPress);
   };
 
@@ -72,11 +77,10 @@
       item.addEventListener('click', function (evt) {
         evt.preventDefault();
         uploadedImg.classList = '';
-        scaleLevelInput.value = '100%';
         var input = item.children[0];
         var effect = input.value;
         input.checked = true;
-        uploadedImg.style = '';
+        uploadedImg.style.filter = '';
         effectPin.style.left = '100%';
         effectDepth.style.width = '100%';
         effectLevelInput.value = 100;
@@ -178,6 +182,7 @@
   var initSetupForm = function () {
     window.setupForm.uploadFileFormEscPress = uploadFileFormEscPress;
     window.setupForm.uploadFileFormClose = uploadFileFormClose;
+    window.setupForm.setFormToDefault = setFormToDefault;
     uploadInput.addEventListener('change', uploadFileFormOpen);
     setFormToDefault();
     scaleImg();

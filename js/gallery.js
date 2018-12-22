@@ -94,9 +94,9 @@
   var bigPictureEscPressCloseHandler = function (evt) {
     if (evt.keyCode === window.utils.ESC_CODE) {
       bigPicture.classList.add('hidden');
+      document.removeEventListener('keydown', bigPictureEscPressCloseHandler);
+      bigPictureCloser.removeEventListener('click', bigPictureCloseHandler);
     }
-    document.removeEventListener('keydown', bigPictureEscPressCloseHandler);
-    bigPictureCloser.removeEventListener('click', bigPictureCloseHandler);
   };
 
   var renderBigPhoto = function (bigPicturePhoto) {

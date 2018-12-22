@@ -4,8 +4,9 @@
   var INVALID_BORDER_STYLE = '1px solid red';
   var MAX_HASHTAGS = 5;
   var MAX_HASHTAG_LENGTH = 20;
-  var MAX_COMMENT_LENGTH = 120;
+  var MAX_COMMENT_LENGTH = 140;
   var uploadFileForm = document.querySelector('.img-upload__form');
+  var uploadFileOverlay = document.querySelector('.img-upload__overlay');
   var hashtagInput = document.querySelector('.text__hashtags');
   var commentInput = document.querySelector('.text__description');
   var successTemplate = document.querySelector('#success')
@@ -22,8 +23,9 @@
   var hashtagsValidate = function () {
     hashtagInput.addEventListener('input', function (evt) {
       var target = evt.target;
-      var checkSpace = target.value.match(/([a-z#]{1,}#)/ig);
-      var hashtagsArray = target.value.toLowerCase().split(' ');
+      var value = target.value.trim();
+      var checkSpace = value.match(/([a-z#]{1,}#)/ig);
+      var hashtagsArray = value.toLowerCase().split(' ');
       if (hashtagsArray[0] === '') {
         hashtagsArray = [];
       }
@@ -41,7 +43,7 @@
         function isSame(hashtag) {
           return hashtag === item;
         }
-        var spliced = target.value.toLowerCase().split(' ');
+        var spliced = value.toLowerCase().split(' ');
         spliced.splice(index, 1);
         if (item === '#') {
           target.setCustomValidity('Хэш-тег не может состоять только из одной решетки');
@@ -92,7 +94,8 @@
   };
 
   var successHandler = function () {
-    window.setupForm.uploadFileFormClose();
+    window.setupForm.setFormToDefault();
+    uploadFileOverlay.classList.add('hidden');
     successPopup.style.visibility = 'visible';
     successButton.addEventListener('click', function () {
       successPopup.style.visibility = 'hidden';
@@ -107,7 +110,8 @@
     });
   };
   var errorHandler = function () {
-    window.setupForm.uploadFileFormClose();
+    window.setupForm.setFormToDefault();
+    uploadFileOverlay.classList.add('hidden');
     errorPopup.style.visibility = 'visible';
     errorButton.addEventListener('click', function () {
       errorPopup.style.visibility = 'hidden';
