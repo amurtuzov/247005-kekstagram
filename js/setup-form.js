@@ -31,8 +31,8 @@
   };
 
   var uploadFileFormEscPress = function (evt) {
-    evt.preventDefault();
     if (evt.keyCode === window.utils.ESC_CODE) {
+      evt.preventDefault();
       uploadFileOverlay.classList.add('hidden');
       setFormToDefault();
       uploadFileFormCloser.removeEventListener('click', uploadFileFormClose);

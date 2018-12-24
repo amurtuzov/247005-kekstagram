@@ -17,12 +17,15 @@
     .content
     .querySelector('.error');
 
+  var filterBySpaces = function (hash) {
+    return hash !== '';
+  };
   var hashtagsValidate = function () {
     hashtagInput.addEventListener('input', function (evt) {
       var target = evt.target;
       var value = target.value.trim();
-      var checkSpace = value.match(/([a-z#]{1,}#)/ig);
-      var hashtagsArray = value.toLowerCase().split(' ');
+      var checkSpace = value.match(/([a-z0-9#]{1,}#)/ig);
+      var hashtagsArray = value.toLowerCase().split(' ').filter(filterBySpaces);
       if (hashtagsArray[0] === '') {
         hashtagsArray = [];
       }
@@ -40,7 +43,7 @@
         function isSame(hashtag) {
           return hashtag === item;
         }
-        var spliced = value.toLowerCase().split(' ');
+        var spliced = value.toLowerCase().split(' ').filter(filterBySpaces);
         spliced.splice(index, 1);
         if (item === '#') {
           target.setCustomValidity('Хэш-тег не может состоять только из одной решетки');
